@@ -45,7 +45,7 @@ resource "aws_elb" "drone" {
 }
 
 resource "aws_instance" "drone" {
-  ami = "ami-aa7ab6c2"
+  ami = "ami-018c9568"
   instance_type = "t1.micro"
 
   connection {
@@ -57,7 +57,14 @@ resource "aws_instance" "drone" {
   # Our Security group to allow HTTP and SSH access
   security_groups = ["${aws_security_group.drone.name}"]
 
-  provisioner "local-exec" {
-      command = "sudo apt-get -y update && sudo apt-get install libsqlite3-dev docker.io"
+  provisioner "remote-exec" {
+    inline = [
+        "sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9",
+        "sudo sh -c \"echo deb https://get.docker.com/ubuntu docker main > /etc/apt/sources.list.d/docker.list\"",
+        "sudo apt-get -y update",
+        "sudo apt-get -y install libsqlite3-dev lxc-docker",
+        "wget downloads.drone.io/master/drone.deb",
+        "sudo dpkg --install drone.deb"
+    ]
   }
 }
