@@ -48,6 +48,12 @@ resource "aws_instance" "drone" {
   ami = "ami-aa7ab6c2"
   instance_type = "t1.micro"
 
+  connection {
+    user = "ubuntu"
+    key_file = "${var.key_path}"
+  }
+  key_name = "${var.key_name}"
+
   # Our Security group to allow HTTP and SSH access
   security_groups = ["${aws_security_group.drone.name}"]
 
